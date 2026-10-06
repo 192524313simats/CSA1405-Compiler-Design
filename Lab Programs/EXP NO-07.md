@@ -1,0 +1,123 @@
+#include <stdio.h>
+#include <ctype.h>
+
+void FIRST(char[], char);
+void addToResultSet(char[], char);
+
+int numOfProductions;
+char productionSet[10][10];
+
+int main()
+{
+    int i;
+    char choice;
+    char c;
+    char result[20];
+
+    printf("How many number of productions ? : ");
+    scanf("%d", &numOfProductions);
+
+    for (i = 0; i < numOfProductions; i++)
+    {
+        printf("Enter productions Number %d : ", i + 1);
+        scanf("%s", productionSet[i]);
+    }
+
+    do
+    {
+        printf("\nFind the FIRST of : ");
+        scanf(" %c", &c);
+
+        FIRST(result, c);
+
+        printf("\nFIRST(%c) = { ", c);
+
+        for (i = 0; result[i] != '\0'; i++)
+            printf(" %c ", result[i]);
+
+        printf("}\n");
+
+        printf("Press 'y' to continue : ");
+        scanf(" %c", &choice);
+
+    } while (choice == 'y' || choice == 'Y');
+
+    return 0;
+}
+
+void FIRST(char Result[], char c)
+{
+    int i, j, k;
+    char subResult[20];
+    int foundEpsilon;
+
+    subResult[0] = '\0';
+    Result[0] = '\0';
+
+    /* If c is a terminal */
+    if (!isupper(c))
+    {
+        addToResultSet(Result, c);
+        return;
+    }
+
+    /* If c is a non-terminal */
+    for (i = 0; i < numOfProductions; i++)
+    {
+        /* Find production with c as LHS */
+        if (productionSet[i][0] == c)
+        {
+            /* If production is X -> $ */
+            if (productionSet[i][2] == '$')
+            {
+                addToResultSet(Result, '$');
+            }
+            else
+            {
+                j = 2;
+
+                while (productionSet[i][j] != '\0')
+                {
+                    foundEpsilon = 0;
+
+                    FIRST(subResult, productionSet[i][j]);
+
+                    for (k = 0; subResult[k] != '\0'; k++)
+                    {
+                        addToResultSet(Result, subResult[k]);
+                    }
+
+                    for (k = 0; subResult[k] != '\0'; k++)
+                    {
+                        if (subResult[k] == '$')
+                        {
+                            foundEpsilon = 1;
+                            break;
+                        }
+                    }
+
+                    /* If epsilon is not found, stop */
+                    if (!foundEpsilon)
+                        break;
+
+                    j++;
+                }
+            }
+        }
+    }
+}
+
+void addToResultSet(char Result[], char val)
+{
+    int k;
+
+    for (k = 0; Result[k] != '\0'; k++)
+    {
+        if (Result[k] == val)
+            return;
+    }
+
+    Result[k] = val;
+    Result[k + 1] = '\0';
+}
+<img width="607" height="638" alt="Screenshot 2026-10-06 095431" src="https://github.com/user-attachments/assets/24266028-23d2-4a96-bd08-d013aa983df4" />
